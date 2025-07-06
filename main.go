@@ -39,6 +39,12 @@ func NewService(dbPath string) Service {
 		}
 	}
 	writer := csv.NewWriter(file)
+	// 写入 UTF-8 BOM，防止中文在 Excel 中显示乱码
+	// BOM 是字节序标记：0xEF,0xBB,0xBF
+	_, err = file.Write([]byte{0xEF, 0xBB, 0xBF})
+	if err != nil {
+		panic("Write" + err.Error())
+	}
 
 	return Service{
 		DB:     db,
