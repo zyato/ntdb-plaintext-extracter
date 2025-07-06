@@ -1,0 +1,79 @@
+syntax = "proto3";
+package model;
+option go_package = "./pbmodel";
+// 顶层消息结构：一条消息中可以有多个消息段
+// 类型为protobuf 或 protobuf array。一条消息中可以有多个消息段，按内容顺序，类似于富文本；部分类型中可嵌套
+message MsgBody {
+  repeated MsgElem elements = 40800;
+}
+
+// 消息段结构
+message MsgElem {
+  int32 chatType = 40010;
+  int32 elementID = 45001; // 元素id，与msgid一样，具有唯一性
+  ElementType elementType = 45002;
+  int32 subElementType = 45003; // ？ 未确定
+  string msgId = 45004; // +faceType
+  string content = 45101; // 文本消息。elementType=1
+  string text = 45102; // 语音转文字。elementType=4
+  string fileName = 45402; // 文件名。elementType=3/4
+  string filePath = 45403; // 文件路径。elementType=3/4
+  int32 fileSize = 45405; // 文件大小。elementType=3/4
+  int32 md5HexStr = 45406; // 视频消息中对应videoMD5。elementType=3
+  bytes file10MMD5 = 45407; // 未知。elementType=3/4
+  bytes fileSha = 45408; // 未知。elementType=3
+  bytes fileSha3 = 45409; // 未知。elementType=
+  int32 videoTime = 45410; // 视频时间。elementType=3/5
+  int32 thumbWidth = 45411; // 预览封面宽度。elementType=5
+  int32 thumbHeight = 45412; // 预览封面高度。elementType=5
+  int32 picWidth = 45413; // 原图宽度
+  int32 picHeight = 45414; // 原图高度
+  int32 thumbSize = 45415; // 预览封面大小。elementType=5
+  int32 picType = 45416; // 图片类型，1000为静态图片，2000为gif。elementType=2
+  int32 original = 45418;
+  string thumbFilename = 45422; //（非官方）预览封面路径位于半私有目录/Tencent/MobileQQ/shortvideo/thumbs/。elementType=5
+  bytes originImageMd5 = 45424;
+  string fileUuid = 45503;
+  bytes thumbMD5 = 45862; // 预览封面MD5(对于45422文件)。elementType=5
+  int32 duration = 45906; // 语音持续时间。elementType=4
+  string voiceText = 45923; // 语音转文字。elementType=4
+  bytes waveAmplitudes = 45925; // 信号频率。elementType=4
+  string picThumbPath = 45954; // 预览封面路径。elementType=3
+  int32 replyMsgId = 47401; // 引用的消息msgid。elementType=7
+  int32 replyMsgSeq = 47402; // 引用的消息seq。elementType=7
+  int32 replyMsgTime1 = 47403; // 引用的消息发送时间戳。elementType=7
+  int32 replyMsgTime2 = 47404; // 引用的消息发送时间戳。elementType=7
+  string replyContent = 47413; // 引用的消息，仅文本。elementType=7
+  string replySenderNickname = 47421; // 引用放群昵称。elementType=7
+  int32 sourceMsgIdInRecords = 47422; // 未知。elementType=7
+  int32 faceIndex = 47601; // 表情id。elementType=6
+  string faceText = 47602; // 表情含义（外显文字）
+  string bytesData = 47901; // 卡片详细信息
+  int32 msgTime = 49155; // 发送时间
+  int32 thumbSiz = 95654; // 预览封面大小。elementType=3
+  string recallSuffix = 47713; // 撤回消息后缀，适用于系统撤回消息
+  string xmlContent = 48602; // xml消息内容。elementType=16
+}
+
+// elementType说明
+enum ElementType {
+  ELEMENT_TYPE_UNKNOWN = 0; // 默认未知
+
+  TEXT_ELEMENT = 1;            // 文本段
+  PIC_ELEMENT = 2;             // 图片段
+  FILE_ELEMENT = 3;            // 文件消息
+  PTT_ELEMENT = 4;             // 语音消息
+  VIDEO_ELEMENT = 5;           // 视频消息
+  FACE_ELEMENT = 6;            // QQ系统表情
+  REPLY_ELEMENT = 7;           // 引用
+  GRAY_TIP_ELEMENT = 8;        // 系统消息（灰字提示）
+  WALLET_ELEMENT = 9;          // 红包消息
+  ARK_ELEMENT = 10;            // 卡片消息
+  MARKET_FACE_ELEMENT = 11;    // 商城表情
+  MARKDOWN_ELEMENT = 14;       // markdown消息
+  XML_ELEMENT = 16;            // XML消息
+  INLINE_KEYBOARD_ELEMENT = 17;// markdown按钮消息
+  AV_RECORD_ELEMENT = 21;      // 通话消息
+  FACE_BUBBLE_ELEMENT = 27;    // 弹射表情包
+  SHARE_LOCATION_ELEMENT = 28; // 位置共享
+}
